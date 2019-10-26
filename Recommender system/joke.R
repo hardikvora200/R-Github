@@ -1,0 +1,559 @@
+install.packages("recommenderlab")
+library(recommenderlab)
+library(reshape2)
+library(ggplot2)
+library(data.table)
+recommender_models$UBCF_realRatingMatrix$parameters
+ratings_list <- readxl::read_xlsx("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Recommender system\\joke.xlsx")
+dim(ratings_list)
+View(ratings_list)
+trows <- sample(nrow(ratings_list), 10000) ###Take 10000 random records
+ratings_list <- ratings_list[trows,]
+# memory cleanup
+rm(trows)
+# remove first column since it does not contain user ratings
+ratings_list <- ratings_list[,2:ncol(ratings_list)]
+ratings_list[,][ratings_list[,] == 99] <- NA # set all 99's to NA
+
+###Checking the minimum and maximum ratings when 'NA' values are excluded indicates that the ratings do, in fact, fall within the specified [-10, 10] range:
+min(ratings_list[][], na.rm = TRUE) ## -10
+max(ratings_list[][], na.rm = TRUE) ##  10
+hist(as.vector(as.matrix(ratings_list)), main = "Distribution of Ratings",
+     col = "yellow", xlab = "Ratings")
+boxplot(as.vector(as.matrix(ratings_list)), col = "green", main = "Distribution of Ratings", ylab = "Ratings")
+summary(as.vector(as.matrix(ratings_list))) ##Mean - 1.7, Median - 2.3
+##While the mean is lower than the median, plotting the average rating per user shows that those values 
+##do appear to be approximately normally distributed, though not exactly zero-centered:
+average_ratings_per_user <- rowMeans(ratings_list, na.rm = TRUE)
+hist(average_ratings_per_user, main = "Distribution of the average rating per user",col = "yellow")
+# memory cleanup
+rm(average_ratings_per_user)
+## covert to matrix format
+ratings_matrix <- as.matrix(ratings_list)
+dim(ratings_matrix)
+## recommendarlab realRatingMatrix format
+R <- as(ratings_matrix , "realRatingMatrix")
+# split the data into the training and the test set:
+e <- evaluationScheme(R, method="split", train=0.8,given=-1,goodRating=0)
+#Popularity based 
+?evaluationScheme
+movie_recomm_model1 <- Recommender(R, method="POPULAR")
+?Recommender(methods)
+#Predictions for two users 
+recommended_items1 <- predict(movie_recomm_model1, R[1:150], n=5)
+as(recommended_items1, "list")
+
+## Popularity model recommends the same movies for all users , we need to improve our model using # # Collaborative Filtering
+#User Based Collaborative Filtering
+movie_recomm_model2 <- Recommender(R, method="UBCF")
+#Predictions for two users 
+recommended_items2 <- predict(movie_recomm_model2, R[1:150], n=5)
+as(recommended_items2, "list")
+#Item Based Collaborative Filtering
+movie_recomm_model3 <- Recommender(R, method="IBCF")
+#Predictions for two users 
+recommended_items3 <- predict(movie_recomm_model3, R[1:150], n=5)
+as(recommended_items3, "list")
+#SVD
+movie_recomm_model4 <- Recommender(R, method="SVD")
+#Predictions for two users 
+recommended_items4 <- predict(movie_recomm_model4, R[1:150], n=5)
+as(recommended_items4, "list")
+#Funk SVD 
+movie_recomm_model5 <- Recommender(R, method="SVDF")
+#Predictions for two users 
+recommended_items5 <- predict(movie_recomm_model5, R[1:150], n=5)
+as(recommended_items5, "list")
+#Alternating Least Square
+movie_recomm_model6 <- Recommender(R, method="ALS")
+#Predictions for two users 
+recommended_items6 <- predict(movie_recomm_model6, R[1:150], n=5)
+as(recommended_items6, "list")
+#Matrix Factorization with LIBMF
+movie_recomm_model7 <- Recommender(R, method="LIBMF")
+#Predictions for two users 
+recommended_items7 <- predict(movie_recomm_model7, R[1:150], n=5)
+as(recommended_items7, "list")
+##Association rule based recommender
+movie_recomm_model8 <- Recommender(R, method="AR")
+#Predictions for two users 
+recommended_items8 <- predict(movie_recomm_model8, R[1:150], n=5)
+as(recommended_items8, "list")
+##Randomly chosen items for comparison 
+movie_recomm_model9 <- Recommender(R, method="RANDOM")
+#Predictions for two users 
+recommended_items9 <- predict(movie_recomm_model9, R[1:150], n=5)
+as(recommended_items9, "list")
+###Re-recommend liked items
+movie_recomm_model10 <- Recommender(R, method="RERECOMMEND")
+#Predictions for two users 
+recommended_items10 <- predict(movie_recomm_model10, R[1:150], n=5)
+as(recommended_items10, "list")
+
+#train UBCF cosine similarity models
+# non-normalized
+UBCF_N_C <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="Cosine"))
+
+# centered
+UBCF_C_C <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="Cosine"))
+
+# Z-score normalization
+UBCF_Z_C <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="Cosine"))
+# compute predicted ratings
+p1 <- predict(UBCF_N_C, getData(e, "known"), type="ratings")
+
+p2 <- predict(UBCF_C_C, getData(e, "known"), type="ratings")
+
+p3 <- predict(UBCF_Z_C, getData(e, "known"), type="ratings")
+
+# set all predictions that fall outside the valid range to the boundary values
+p1@data@x[p1@data@x[] < -10] <- -10
+p1@data@x[p1@data@x[] > 10] <- 10
+
+p2@data@x[p2@data@x[] < -10] <- -10
+p2@data@x[p2@data@x[] > 10] <- 10
+
+p3@data@x[p3@data@x[] < -10] <- -10
+p3@data@x[p3@data@x[] > 10] <- 10
+
+# aggregate the performance statistics
+error_UCOS <- rbind(
+  UBCF_N_C = calcPredictionAccuracy(p1, getData(e, "unknown")),
+  UBCF_C_C = calcPredictionAccuracy(p2, getData(e, "unknown")),
+  UBCF_Z_C = calcPredictionAccuracy(p3, getData(e, "unknown"))
+)
+library(knitr)
+kable(error_UCOS) ###UBCF_Z_C has least RMSE,MSE,MAE 
+# memory cleanup
+rm(UBCF_N_C, UBCF_C_C, UBCF_Z_C)
+boxplot(as.vector(as(p3, "matrix")), col = "yellow", 
+        main = "Distribution of Predicted Values for UBCF Z-Score/Cosine Model", ylab = "Ratings")
+hist(as.vector(as(p3, "matrix")), main = "Distrib. of Predicted Values for UBCF Z-Score/Cosine Model",
+     col = "yellow", xlab = "Predicted Ratings")
+summary(as.vector(as.matrix(ratings_matrix)))
+summary(as.vector(p3@data@x))
+#train UBCF Distance models
+
+# non-normalized
+UBCF_N_E_1 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="Euclidean"))
+
+# centered
+UBCF_C_E_1 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="Euclidean"))
+
+# Z-score normalization
+UBCF_Z_E_1 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="Euclidean"))
+# non-normalized
+UBCF_N_E_2 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="Manhattan"))
+
+# centered
+UBCF_C_E_2 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="Manhattan"))
+
+# Z-score normalization
+UBCF_Z_E_2 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="Manhattan"))
+# non-normalized
+UBCF_N_E_3 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="Maximum"))
+
+# centered
+UBCF_C_E_3 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="Maximum"))
+
+# Z-score normalization
+UBCF_Z_E_3 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="Maximum"))
+# non-normalized
+UBCF_N_E_4 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="Binary"))
+
+# centered
+UBCF_C_E_4 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="Binary"))
+
+# Z-score normalization
+UBCF_Z_E_4 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="Binary"))
+# non-normalized
+UBCF_N_E_5 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="Canberra"))
+
+# centered
+UBCF_C_E_5 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="Canberra"))
+
+# Z-score normalization
+UBCF_Z_E_5 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="Canberra"))
+####Evaluation of the model is as follows:-
+# compute predicted ratings
+p4 <- predict(UBCF_N_E_1, getData(e, "known"), type="ratings")
+
+p5 <- predict(UBCF_C_E_1, getData(e, "known"), type="ratings")
+
+p6 <- predict(UBCF_Z_E_1, getData(e, "known"), type="ratings")
+p7 <- predict(UBCF_N_E_2, getData(e, "known"), type="ratings")
+
+p8 <- predict(UBCF_C_E_2, getData(e, "known"), type="ratings")
+
+p9 <- predict(UBCF_Z_E_2, getData(e, "known"), type="ratings")
+p10 <- predict(UBCF_N_E_3, getData(e, "known"), type="ratings")
+
+p11 <- predict(UBCF_C_E_3, getData(e, "known"), type="ratings")
+
+p12 <- predict(UBCF_Z_E_3, getData(e, "known"), type="ratings")
+p13 <- predict(UBCF_N_E_4, getData(e, "known"), type="ratings")
+
+p14 <- predict(UBCF_C_E_4, getData(e, "known"), type="ratings")
+
+p15 <- predict(UBCF_Z_E_4, getData(e, "known"), type="ratings")
+p16 <- predict(UBCF_N_E_5, getData(e, "known"), type="ratings")
+
+p17 <- predict(UBCF_C_E_5, getData(e, "known"), type="ratings")
+
+p18 <- predict(UBCF_Z_E_5, getData(e, "known"), type="ratings")
+# set all predictions that fall outside the valid range to the boundary values
+p4@data@x[p4@data@x[] < -10] <- -10
+p4@data@x[p4@data@x[] > 10] <- 10
+p5@data@x[p5@data@x[] < -10] <- -10
+p5@data@x[p5@data@x[] > 10] <- 10
+p6@data@x[p6@data@x[] < -10] <- -10
+p6@data@x[p6@data@x[] > 10] <- 10
+p7@data@x[p7@data@x[] < -10] <- -10
+p7@data@x[p7@data@x[] > 10] <- 10
+p8@data@x[p8@data@x[] < -10] <- -10
+p8@data@x[p8@data@x[] > 10] <- 10
+p9@data@x[p9@data@x[] < -10] <- -10
+p9@data@x[p9@data@x[] > 10] <- 10
+p10@data@x[p10@data@x[] < -10] <- -10
+p10@data@x[p10@data@x[] > 10] <- 10
+p11@data@x[p11@data@x[] < -10] <- -10
+p11@data@x[p11@data@x[] > 10] <- 10
+p12@data@x[p12@data@x[] < -10] <- -10
+p12@data@x[p12@data@x[] > 10] <- 10
+p13@data@x[p13@data@x[] < -10] <- -10
+p13@data@x[p13@data@x[] > 10] <- 10
+p14@data@x[p14@data@x[] < -10] <- -10
+p14@data@x[p14@data@x[] > 10] <- 10
+p15@data@x[p15@data@x[] < -10] <- -10
+p15@data@x[p15@data@x[] > 10] <- 10
+p16@data@x[p16@data@x[] < -10] <- -10
+p16@data@x[p16@data@x[] > 10] <- 10
+p17@data@x[p17@data@x[] < -10] <- -10
+p17@data@x[p17@data@x[] > 10] <- 10
+p18@data@x[p18@data@x[] < -10] <- -10
+p18@data@x[p18@data@x[] > 10] <- 10
+
+# aggregate the performance statistics
+error_UEUC_1 <- rbind(
+  UBCF_N_E_1 = calcPredictionAccuracy(p1, getData(e, "unknown")),
+  UBCF_C_E_1 = calcPredictionAccuracy(p2, getData(e, "unknown")),
+  UBCF_Z_E_1 = calcPredictionAccuracy(p3, getData(e, "unknown"))
+)
+error_UEUC_2 <- rbind(
+  UBCF_N_E_2 = calcPredictionAccuracy(p4, getData(e, "unknown")),
+  UBCF_C_E_2 = calcPredictionAccuracy(p5, getData(e, "unknown")),
+  UBCF_Z_E_2 = calcPredictionAccuracy(p6, getData(e, "unknown"))
+)
+error_UEUC_3 <- rbind(
+  UBCF_N_E_3 = calcPredictionAccuracy(p7, getData(e, "unknown")),
+  UBCF_C_E_3 = calcPredictionAccuracy(p8, getData(e, "unknown")),
+  UBCF_Z_E_3 = calcPredictionAccuracy(p9, getData(e, "unknown"))
+)
+error_UEUC_4 <- rbind(
+  UBCF_N_E_4 = calcPredictionAccuracy(p10, getData(e, "unknown")),
+  UBCF_C_E_4 = calcPredictionAccuracy(p11, getData(e, "unknown")),
+  UBCF_Z_E_4 = calcPredictionAccuracy(p12, getData(e, "unknown"))
+)
+error_UEUC_5 <- rbind(
+  UBCF_N_E_5 = calcPredictionAccuracy(p13, getData(e, "unknown")),
+  UBCF_C_E_5 = calcPredictionAccuracy(p14, getData(e, "unknown")),
+  UBCF_Z_E_5 = calcPredictionAccuracy(p15, getData(e, "unknown"))
+)
+kable(error_UEUC_1)
+kable(error_UEUC_2)
+kable(error_UEUC_3)
+kable(error_UEUC_4)
+kable(error_UEUC_5)
+#train UBCF pearson correlation models
+
+# non-normalized
+UBCF_N_P_6 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = NULL, method="pearson"))
+
+# centered
+UBCF_C_P_6 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "center",method="pearson"))
+
+# Z-score normalization
+UBCF_Z_P_6 <- Recommender(getData(e, "train"), "UBCF", 
+                        param=list(normalize = "Z-score",method="pearson"))
+# compute predicted ratings
+p19 <- predict(UBCF_N_P_6, getData(e, "known"), type="ratings")
+
+p20 <- predict(UBCF_C_P_6, getData(e, "known"), type="ratings")
+
+p21 <- predict(UBCF_Z_P_6, getData(e, "known"), type="ratings")
+
+# set all predictions that fall outside the valid range to the boundary values
+p19@data@x[p19@data@x[] < -10] <- -10
+p19@data@x[p19@data@x[] > 10] <- 10
+
+p20@data@x[p20@data@x[] < -10] <- -10
+p20@data@x[p20@data@x[] > 10] <- 10
+
+p21@data@x[p21@data@x[] < -10] <- -10
+p21@data@x[p21@data@x[] > 10] <- 10
+
+# aggregate the performance statistics
+error_UPC_6 <- rbind(
+  UBCF_N_P_6 = calcPredictionAccuracy(p16, getData(e, "unknown")),
+  UBCF_C_P_6 = calcPredictionAccuracy(p17, getData(e, "unknown")),
+  UBCF_Z_P_6 = calcPredictionAccuracy(p18, getData(e, "unknown"))
+)
+kable(error_UPC_6)
+#train IBCF cosine similarity models
+
+# non-normalized
+IBCF_N_C <- Recommender(getData(e, "train"), "IBCF", 
+                        param=list(normalize = NULL, method="Cosine"))
+
+# centered
+IBCF_C_C <- Recommender(getData(e, "train"), "IBCF", 
+                        param=list(normalize = "center",method="Cosine"))
+
+# Z-score normalization
+IBCF_Z_C <- Recommender(getData(e, "train"), "IBCF", 
+                        param=list(normalize = "Z-score",method="Cosine"))
+####Evaluation of the model is performed as below
+# compute predicted ratings
+p22 <- predict(IBCF_N_C, getData(e, "known"), type="ratings")
+p23 <- predict(IBCF_C_C, getData(e, "known"), type="ratings")
+p24 <- predict(IBCF_Z_C, getData(e, "known"), type="ratings")
+
+# set all predictions that fall outside the valid range to the boundary values
+p22@data@x[p22@data@x[] < -10] <- -10
+p22@data@x[p22@data@x[] > 10] <- 10
+
+p23@data@x[p23@data@x[] < -10] <- -10
+p23@data@x[p23@data@x[] > 10] <- 10
+
+p24@data@x[p24@data@x[] < -10] <- -10
+p24@data@x[p24@data@x[] > 10] <- 10
+
+# aggregate the performance statistics
+error_ICOS <- rbind(
+  IBCF_N_C = calcPredictionAccuracy(p1, getData(e, "unknown")),
+  IBCF_C_C = calcPredictionAccuracy(p2, getData(e, "unknown")),
+  IBCF_Z_C = calcPredictionAccuracy(p3, getData(e, "unknown"))
+)
+library(knitr)
+kable(error_ICOS) ###IBCF_C_C has least RMSE,MSE,MAE 
+# memory cleanup
+rm(IBCF_N_C, IBCF_C_C, IBCF_Z_C)
+boxplot(as.vector(as(p20, "matrix")), col = "yellow", 
+        main = "Distribution of Predicted Values for IBCF Raw/Cosine Model", ylab = "Ratings")
+hist(as.vector(as(p20, "matrix")), main = "Distrib. of Predicted Values for IBCF Raw/Cosine Model",
+     col = "yellow", xlab = "Predicted Ratings")
+summary(as.vector(p20@data@x))
+#train IBCF Euclidean Distance models
+# non-normalized
+IBCF_N_E_1 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = NULL, method="Euclidean"))
+
+# centered
+IBCF_C_E_1 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "center",method="Euclidean"))
+
+# Z-score normalization
+IBCF_Z_E_1 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "Z-score",method="Euclidean"))
+# non-normalized
+IBCF_N_E_2 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = NULL, method="Manhattan"))
+
+# centered
+IBCF_C_E_2 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "center",method="Manhattan"))
+
+# Z-score normalization
+IBCF_Z_E_2 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "Z-score",method="Manhattan"))
+# non-normalized
+IBCF_N_E_3 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = NULL, method="Maximum"))
+
+# centered
+IBCF_C_E_3 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "center",method="Maximum"))
+
+# Z-score normalization
+IBCF_Z_E_3 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "Z-score",method="Maximum"))
+# non-normalized
+IBCF_N_E_4 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = NULL, method="Binary"))
+
+# centered
+IBCF_C_E_4 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "center",method="Binary"))
+
+# Z-score normalization
+IBCF_Z_E_4 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "Z-score",method="Binary"))
+# non-normalized
+IBCF_N_E_5 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = NULL, method="Canberra"))
+
+# centered
+IBCF_C_E_5 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "center",method="Canberra"))
+
+# Z-score normalization
+IBCF_Z_E_5 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "Z-score",method="Canberra"))
+####Evaluation of the model is as follows:-
+# compute predicted ratings
+p25 <- predict(IBCF_N_E_1, getData(e, "known"), type="ratings")
+
+p26 <- predict(IBCF_C_E_1, getData(e, "known"), type="ratings")
+
+p27 <- predict(IBCF_Z_E_1, getData(e, "known"), type="ratings")
+p28 <- predict(IBCF_N_E_2, getData(e, "known"), type="ratings")
+
+p29 <- predict(IBCF_C_E_2, getData(e, "known"), type="ratings")
+
+p30 <- predict(IBCF_Z_E_2, getData(e, "known"), type="ratings")
+p31 <- predict(IBCF_N_E_3, getData(e, "known"), type="ratings")
+
+p32 <- predict(IBCF_C_E_3, getData(e, "known"), type="ratings")
+
+p33 <- predict(IBCF_Z_E_3, getData(e, "known"), type="ratings")
+p34 <- predict(IBCF_N_E_4, getData(e, "known"), type="ratings")
+
+p35 <- predict(IBCF_C_E_4, getData(e, "known"), type="ratings")
+
+p36 <- predict(IBCF_Z_E_4, getData(e, "known"), type="ratings")
+p37 <- predict(IBCF_N_E_5, getData(e, "known"), type="ratings")
+
+p38 <- predict(IBCF_C_E_5, getData(e, "known"), type="ratings")
+
+p39 <- predict(IBCF_Z_E_5, getData(e, "known"), type="ratings")
+# set all predictions that fall outside the valid range to the boundary values
+p25@data@x[p25@data@x[] < -10] <- -10
+p25@data@x[p25@data@x[] > 10] <- 10
+p26@data@x[p26@data@x[] < -10] <- -10
+p26@data@x[p26@data@x[] > 10] <- 10
+p27@data@x[p27@data@x[] < -10] <- -10
+p27@data@x[p27@data@x[] > 10] <- 10
+p28@data@x[p28@data@x[] < -10] <- -10
+p28@data@x[p28@data@x[] > 10] <- 10
+p29@data@x[p29@data@x[] < -10] <- -10
+p29@data@x[p29@data@x[] > 10] <- 10
+p30@data@x[p30@data@x[] < -10] <- -10
+p30@data@x[p30@data@x[] > 10] <- 10
+p31@data@x[p31@data@x[] < -10] <- -10
+p31@data@x[p31@data@x[] > 10] <- 10
+p32@data@x[p32@data@x[] < -10] <- -10
+p32@data@x[p32@data@x[] > 10] <- 10
+p33@data@x[p33@data@x[] < -10] <- -10
+p33@data@x[p33@data@x[] > 10] <- 10
+p34@data@x[p34@data@x[] < -10] <- -10
+p34@data@x[p34@data@x[] > 10] <- 10
+p35@data@x[p35@data@x[] < -10] <- -10
+p35@data@x[p35@data@x[] > 10] <- 10
+p36@data@x[p36@data@x[] < -10] <- -10
+p36@data@x[p36@data@x[] > 10] <- 10
+p37@data@x[p37@data@x[] < -10] <- -10
+p37@data@x[p37@data@x[] > 10] <- 10
+p38@data@x[p38@data@x[] < -10] <- -10
+p38@data@x[p38@data@x[] > 10] <- 10
+p39@data@x[p39@data@x[] < -10] <- -10
+p39@data@x[p39@data@x[] > 10] <- 10
+
+# aggregate the performance statistics
+error_IEUC_1 <- rbind(
+  IBCF_N_E_1 = calcPredictionAccuracy(p25, getData(e, "unknown")),
+  IBCF_C_E_1 = calcPredictionAccuracy(p26, getData(e, "unknown")),
+  IBCF_Z_E_1 = calcPredictionAccuracy(p27, getData(e, "unknown"))
+)
+error_IEUC_2 <- rbind(
+  IBCF_N_E_2 = calcPredictionAccuracy(p28, getData(e, "unknown")),
+  IBCF_C_E_2 = calcPredictionAccuracy(p29, getData(e, "unknown")),
+  IBCF_Z_E_2 = calcPredictionAccuracy(p30, getData(e, "unknown"))
+)
+error_IEUC_3 <- rbind(
+  IBCF_N_E_3 = calcPredictionAccuracy(p31, getData(e, "unknown")),
+  IBCF_C_E_3 = calcPredictionAccuracy(p32, getData(e, "unknown")),
+  IBCF_Z_E_3 = calcPredictionAccuracy(p33, getData(e, "unknown"))
+)
+error_IEUC_4 <- rbind(
+  IBCF_N_E_4 = calcPredictionAccuracy(p34, getData(e, "unknown")),
+  IBCF_C_E_4 = calcPredictionAccuracy(p35, getData(e, "unknown")),
+  IBCF_Z_E_4 = calcPredictionAccuracy(p36, getData(e, "unknown"))
+)
+error_IEUC_5 <- rbind(
+  IBCF_N_E_5 = calcPredictionAccuracy(p37, getData(e, "unknown")),
+  IBCF_C_E_5 = calcPredictionAccuracy(p38, getData(e, "unknown")),
+  IBCF_Z_E_5 = calcPredictionAccuracy(p39, getData(e, "unknown"))
+)
+kable(error_IEUC_1)
+kable(error_IEUC_2)
+kable(error_IEUC_3)
+kable(error_IEUC_4)
+kable(error_IEUC_5)
+#train IBCF pearson correlation models
+
+# non-normalized
+IBCF_N_P_6 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = NULL, method="pearson"))
+
+# centered
+IBCF_C_P_6 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "center",method="pearson"))
+
+# Z-score normalization
+IBCF_Z_P_6 <- Recommender(getData(e, "train"), "IBCF", 
+                          param=list(normalize = "Z-score",method="pearson"))
+# compute predicted ratings
+p40 <- predict(IBCF_N_P_6, getData(e, "known"), type="ratings")
+
+p41 <- predict(IBCF_C_P_6, getData(e, "known"), type="ratings")
+
+p42 <- predict(IBCF_Z_P_6, getData(e, "known"), type="ratings")
+
+# set all predictions that fall outside the valid range to the boundary values
+p40@data@x[p40@data@x[] < -10] <- -10
+p40@data@x[p40@data@x[] > 10] <- 10
+
+p41@data@x[p41@data@x[] < -10] <- -10
+p41@data@x[p41@data@x[] > 10] <- 10
+
+p42@data@x[p42@data@x[] < -10] <- -10
+p42@data@x[p42@data@x[] > 10] <- 10
+
+# aggregate the performance statistics
+error_IPC_6 <- rbind(
+  IBCF_N_P_6 = calcPredictionAccuracy(p40, getData(e, "unknown")),
+  IBCF_C_P_6 = calcPredictionAccuracy(p41, getData(e, "unknown")),
+  IBCF_Z_P_6 = calcPredictionAccuracy(p42, getData(e, "unknown"))
+)
+kable(error_IPC_6)
+###Conclusion
+c_res <- data.frame(rbind(error_UCOS, error_UEUC_1, error_UEUC_2,error_UEUC_3, 
+                          error_UEUC_4,error_UEUC_5,error_UPC_6, error_ICOS, error_IEUC_1,
+                          error_IEUC_2,error_IEUC_3,error_IEUC_4,error_IEUC_5,error_IPC_6))
+
+c_res <- c_res[order(c_res$RMSE ),]
+
+kable(c_res)
+# las = 3: rotate x axis labels to perendicular; las = 1: rotate y axis labels
+barplot(c_res$RMSE, col = "yellow", main = "Barplot of Model RMSE's", las = 2, ylab = "RMSE", horiz = FALSE, 
+        names.arg = rownames(c_res), cex.names=.8)

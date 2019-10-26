@@ -1,0 +1,375 @@
+install.package("ape")
+library(graphics)
+comp<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Multilinear 
+                  Regression\\Computer_Data.csv")
+View(Computer_Data)
+attach(Computer_Data)
+summary(Computer_Data)
+comp<-Computer_Data[c("price","speed","hd","ram","screen","ads","trend")]
+summary(comp)
+View(comp)
+mean(comp$price)##2219.577-------------Price
+median(comp$price)##2144
+var(comp$price)### 337333.2
+sd(comp$price)### 580.804
+library(moments)
+skewness(comp$price)###0.7115542
+kurtosis(comp$price)### 3.728875
+---------------------------------------------------------
+mean(comp$speed)##-52.01102--------speed
+median(comp$speed)##50
+var(comp$speed)###447.6498
+sd(comp$speed)####21.15774
+skewness(comp$speed)### 0.6568505
+kurtosis(comp$speed)##2.723809
+----------------------------------------------------------
+mean(comp$hd)##416.6017--------hd
+median(comp$hd)##340
+var(comp$hd)##66847.3
+sd(comp$hd)###258.5484
+skewness(comp$hd)###1.377689
+kurtosis(comp$hd)####5.449539
+-----------------------------------------------------------
+mean(comp$ram)##-8.286947---------ram
+median(comp$ram)##8
+var(comp$ram)####31.70928
+sd(comp$ram)### 5.631099
+skewness(comp$ram)####1.38587
+kurtosis(comp$ram)####4.460124
+-----------------------------------------------------------
+mean(comp$screen)##-14.60872-----------screen
+median(comp$screen)## 14
+var(comp$screen)### 0.8192336
+sd(comp$screen)##0.9051152
+skewness(comp$screen)###1.633616
+kurtosis(comp$screen)###4.849387
+-------------------------------------------------------------
+mean(comp$ads)##-221.301------------ads
+median(comp$ads)##246
+var(comp$ads)##5600.32
+sd(comp$ads)##74.83528
+skewness(comp$ads)####-0.5531955
+kurtosis(comp$ads)####2.459629
+----------------------------------------------------------------
+mean(comp$trend)##15.92699-----------------trend
+median(comp$trend)##16
+var(comp$trend)####61.99962
+sd(comp$trend)##7.873984
+skewness(comp$trend)###0.2366127
+kurtosis(comp$trend)###2.325446
+--------------------------------------------------
+barplot(comp$price)  
+barplot(comp$speed)  
+barplot(comp$hd)  
+barplot(comp$ram)  
+barplot(comp$screen)  
+barplot(comp$ads)  
+barplot(comp$trend)  
+------------------------------------------------
+boxplot(comp$price)  
+boxplot(comp$speed)  
+boxplot(comp$hd)  
+boxplot(comp$ram)  
+boxplot(comp$screen)  
+boxplot(comp$ads)  
+boxplot(comp$trend)  
+-----------------------------------------------
+hist(comp$price)  
+hist(comp$speed)  
+hist(comp$hd)  
+hist(comp$ram)  
+hist(comp$screen)  
+hist(comp$ads)  
+hist(comp$trend)  
+--------------------------------------------
+pnorm(comp$price,2219.577, 580.804)  
+pnorm(comp$speed,-52.01102,21.15774)
+pnorm(comp$hd,416.6017,258.5484)
+pnorm(comp$ram,-8.286947,5.631099)
+pnorm(comp$screen,-14.60872,0.9051152)
+pnorm(comp$ads,-221.301,74.83528)
+pnorm(comp$trend,15.92699,7.873984)
+
+-------------------------------------------------------
+qqnorm(comp$price)
+qqline(comp$price)
+logprice<- log(comp$price)
+qqnorm(logprice)
+qqline(logprice)
+----------------------------------
+qqnorm(comp$speed)
+qqline(comp$speed)
+logsp<- log(comp$speed)
+qqnorm(logsp)
+qqline(logsp)
+expsp<- exp(comp$speed)
+qqnorm(expsp)
+qqline(expsp)####little normalisation
+sqrtsp<-sqrt(comp$speed)
+qqnorm(sqrtsp)
+qqline(sqrtsp)
+algsp<-(comp$speed * comp$speed)+comp$speed
+qqnorm(algsp)
+qqline(algsp)
+recsp<-1/comp$speed
+qqnorm(recsp)
+qqline(recsp)
+---------------------------------------------
+qqnorm(comp$hd)
+qqline(comp$hd)
+loghd<-log(comp$hd)
+qqnorm(loghd)
+qqline(loghd)
+exphd<-exp(comp$hd)
+qqnorm(exphd)###need finite ylim values
+sqrthd<-sqrt(comp$hd)
+qqnorm(sqrthd)
+qqline(sqrthd)
+sqrhd<-comp$hd * comp$hd
+qqnorm(sqrhd)
+qqline(sqrhd)
+alghd<-(comp$hd * comp$hd)+comp$hd
+qqnorm(alghd)
+qqline(alghd)
+rechd<-(1/comp$hd)
+qqnorm(rechd)
+qqline(rechd)
+algehd<-(comp$hd * comp$hd * comp$hd) + (comp$hd * comp$hd)+comp$hd
+qqnorm(algehd)
+qqline(algehd)###slightly normalization achieved
+-------------------------------
+qqnorm(comp$ram)
+qqline(comp$ram)
+logram<-log(comp$ram)
+qqnorm(logram)
+qqline(logram)
+expram<-exp(comp$ram)
+qqnorm(expram)
+qqline(expram)###normalization achieved
+------------------------------------
+qqnorm(comp$screen)
+qqline(comp$screen)
+logscreen<-log(comp$screen)
+qqnorm(logscreen)
+qqline(logscreen)
+expscreen<-exp(comp$screen)
+qqnorm(expscreen)
+qqline(expscreen)
+sqrtscreen<-sqrt(comp$screen)
+qqnorm(sqrtscreen)
+qqline(sqrtscreen)
+sqrscreen<- comp$screen * comp$screen
+qqnorm(sqrscreen)
+qqline(sqrscreen)
+algscr<-(comp$screen * comp$screen) + comp$screen
+qqnorm(algscr)
+qqline(algscr)
+recscr<-(1/comp$screen)
+qqnorm(recscr)
+qqline(recscr)
+algescr<-(comp$screen * comp$screen * comp$screen) +(comp$screen * comp$screen) + comp$screen
+qqnorm(algescr)
+qqline(algescr)
+------------------------------
+qqnorm(comp$ads)  
+qqline(comp$ads)
+logad<-log(comp$ads)
+qqnorm(logad)
+qqline(logad)
+expad<-exp(comp$ads)
+qqnorm(expad)
+qqline(expad)#####slightly normalization achieved
+sqrtad<-sqrt(comp$ads)
+qqnorm(sqrtad)
+qqline(sqrtad)
+sqrad<-comp$ads * comp$ads
+qqnorm(sqrad)
+qqline(sqrad)
+recad<-1/comp$ads
+qqnorm(recad)
+qqline(recad)
+algad<-(comp$ads * comp$ads)+comp$ads 
+qqnorm(algad)
+qqline(algad)
+------------------------------------------
+qqnorm(comp$trend)
+qqline(comp$trend)
+exptrend<-exp(comp$trend)
+qqnorm(exptrend)
+qqline(exptrend)
+----------------------------------------------
+########Normalization completed
+  -------------------------------------
+qqplot(exp(comp$speed),comp$price)
+qqplot((comp$hd * comp$hd * comp$hd) + (comp$hd * comp$hd)+comp$hd,comp$price)
+qqplot(exp(comp$ram),comp$price)
+qqplot(comp$screen, comp$price)
+qqplot(exp(comp$ads), comp$price)
+qqplot(exp(comp$trend),comp$price)
+
+----------------------------------------------------
+#############scatter Diagram and Calculation of Correlation
+----------------------------------------
+plot(comp$speed, comp$price)
+cor(comp$speed, comp$price)### 0.3009765
+plot(comp$hd, comp$price)
+cor(comp$hd, comp$price)### 0.4302578
+plot(comp$ram,comp$price)
+cor(comp$ram,comp$price)#####0.6227482
+plot(comp$screen,comp$price)
+cor(comp$screen,comp$price)#####0.2960415
+plot(comp$ads, comp$price)
+cor(comp$ads,comp$price)####0.05454047
+plot(comp$trend,comp$price)
+cor(comp$trend,comp$price)###### -0.1999869
+
+---------------------------------------------------
+######Compute Correlation matrix and Partial Correlation matrix, Covariance matrix
+---------------------------------------
+pairs(comp)####All scatter diagrams in one matrix like plot
+cor(comp)###Gives us a matrix like format
+library(corpcor)
+cor2pcor(cor(comp))
+cov(comp)
+-----------------------------------------------------
+#######Create Normalization function#####33
+normalize<-function(x)
+  {
+    return((x-min(x))/max(x))-min(x)
+  }
+#####test normalization function
+normalize(c(comp$price,comp$speed,comp$hd,comp$ram,comp$screen,comp$ads,comp$trend))
+View(normalize(comp$price))
+View(normalize(comp$speed))
+###Now normalize the whole data
+comp<-as.data.frame(lapply(comp,normalize))
+View(comp)##############Got normalized data
+#######Dividing into Training Data and Test Data
+---------------------------------------------------------
+comp_train<-comp[1:5000,] 
+View(comp_train)
+comp_test<-comp[5001:6259,] 
+View(comp_test)
+------------------------------------------------
+#######Now plot the model 
+----------------------------------------------
+cor2pcor(cor(comp_train))
+cor2pcor(cor(comp_test))
+###model.Corolla_train<-lm(log(Corolla$Price) ~ ((Corolla$Age_08_04 * Corolla$Age_08_04)+
+###                                   Corolla$Age_08_04)+Corolla$KM+
+###        exp(Corolla$HP)+sqrt(Corolla$cc)+Corolla$Doors+Corolla$Gears+
+###            exp(Corolla$Quarterly_Tax)+log(Corolla$Weight))
+model.comp_train <- lm(comp_train$price ~ comp_train$speed + comp_train$hd +comp_train$ram + comp_train$screen + comp_train$ads + comp_train$trend)
+summary(model.comp_train)
+### We got from summary(model.comp_train) all are significant
+#Multiple R Squared - 0.7064,Adjusted R-squared- 0.706,
+###lets try to increase R-squared value by doing some transformations
+model.comp_train1 <- lm(comp_train$price ~ exp(comp_train$speed) + (comp_train$hd * comp_train$hd * comp_train$hd) + (comp_train$hd * comp_train$hd)+comp_train$hd +comp_train$ram + comp_train$screen + comp_train$ads + comp_train$trend)
+summary(model.comp_train1)
+##After doing some transformations Multiple R-squared:0.7001, Adjusted R-squared:0.6997,
+##so lets stick to original one
+##Scatter plot matrix with correlations inserted in graph
+panel.smooth<-function(x, ...)
+{
+  usr <- par("usr");on.exit(par(usr))
+  par(usr=c(usr[1:2],0,5.5))
+  h<-hist(x,plot=FALSE)
+  breaks<-h$breaks; nB<-length(breaks)
+  y<-h$counts; y<- y/max(y)
+  rect(breaks[-nB],0,breaks[-1],y,col="grey90",..)
+}
+panel.cor<-function(x,y,digits=2,prefix = "",cex.cor,..)
+{
+  usr<-par("usr");on.exit(par(usr))
+  par(usr=c(0,1,0,1))
+  r=(cor(x,y))
+  txt<-format(c(r,0.123456789),digits=digits[1])
+  txt<-paste(prefix,txt,sep="")
+  if(missing(cex.cor))cex<-0.4/strwidth(txt)
+  text(0.5,0.5,txt,cex=cex)
+}
+par(no.readonly=FALSE)
+on.exit(expr=NULL, add= FALSE, after = TRUE)
+##summary(panel.corolla(scatterplot(model.Corolla)))
+pairs(comp_train,upper.panel = panel.cor, main="Scatter plot matrix with correlation 
+      coefficient clients")
+
+###########Predict the model
+pred1<-predict(model.comp_train)
+summary(pred1)
+
+#################################Checking normality of residuals
+qqnorm(model.comp_train$residuals)
+qqline(model.comp_train$residuals)#####Most of the residuals are in line i.e.normal
+#####most of the residuals are in line i.e.normal
+sqrt(mean(model.comp_train$residuals^2))#####0.0602065
+
+###########Checking Confidence interval
+confint(model.comp_train,level=0.95)
+
+#####Predict the data with interval of confidence and also prediction
+predict(model.comp_train, interval="confidence")
+predict(model.comp_train, interval = "prediction")
+####Draw ggplot
+library(ggplot2)
+ggplot(data=comp_train, aes(x=comp_train$speed+comp_train$hd+comp_train$ram+comp_train$screen+comp_train$ads+comp_train$trend, y=comp_train$price))+
+  geom_point(color='blue')+geom_line(color='red', data=comp_train,aes(x=comp_train$speed+comp_train$hd+comp_train$ram+comp_train$screen+comp_train$ads+comp_train$trend, y=pred1))
+#line
+ggplot(data=comp_train,aes(comp_train$speed+comp_train$hd+comp_train$ram+comp_train$screen+comp_train$ads+comp_train$trend,comp_train$price))+stat_summary(fun.args = list(),fun.data = mean_cl_normal) +
+  geom_smooth(method='lm')
+
+library(influence.ME)
+##Deletion Diagnostics for identifying influential variables
+influence.measures(model.comp_train)
+infIndexPlot:influenceIndexPlot(model.comp_train,id.n=6)##Indexplot of the influence 
+###measures
+influencePlot(model.comp_train,id.n=6)
+------------------------------------------
+
+##Let us try to delete influential observations
+model.comp_train_1<-lm(comp_train$price ~ comp_train$speed + comp_train$hd +comp_train$ram + comp_train$screen + comp_train$ads + comp_train$trend, data=comp_train[-c(1441,1701,3784,4478),])
+summary(model.comp_train_1)
+##Variance Inflation factor is a formal way to check for collinearity and Doors is not 
+##seems to be significant
+vif(model.comp_train_1)
+###plot(Corolla$Doors,Corolla$Price,col="dodgerblue4", pch=20)
+layout(matrix(c(1,2,3,4),2,2))
+avPlots(model.comp_train_1)
+model.comp_test <- lm(comp_test$price ~ comp_test$speed + comp_test$hd +comp_test$ram + 
+                        comp_test$screen + sqrt(comp_test$ads) + exp(comp_test$trend))
+summary(model.comp_test)
+###After proper normalisation we got Adjusted R-squared:0.8717, Adjusted R-squared:0.817
+pred2<-predict(model.comp_test)
+summary(pred2)
+qqnorm(model.comp_test$residuals)
+qqline(model.comp_test$residuals)
+sqrt(mean(model.comp_test$residuals^2))####0.03115458
+pairs(comp_test,upper.panel = panel.cor, main="Scatter plot matrix with correlation 
+  coefficient clients")
+confint(model.comp_test,level=0.95)
+predict(model.comp_test, interval="confidence")
+predict(model.comp_test, interval="prediction")
+ggplot(data=comp_test, aes(x=comp_test$speed+comp_test$hd+comp_test$ram+comp_test$screen+sqrt(comp_test$ads)+exp(comp_test$trend), y=comp_test$price))+
+  geom_point(color='blue')+geom_line(color='red', data=comp_test,aes(x=comp_test$speed+comp_test$hd+comp_test$ram+comp_test$screen+sqrt(comp_test$ads)+exp(comp_test$trend), y=pred2))
+#line
+ggplot(data=comp_test,aes(comp_test$speed+comp_test$hd+comp_test$ram+comp_test$screen+sqrt(comp_test$ads)+exp(comp_test$trend),comp_test$price))+stat_summary(fun.args = list(),fun.data = mean_cl_normal) + geom_smooth(method='lm')
+influence.measures(model.comp_test)
+infIndexPlot:influenceIndexPlot(model.comp_test,id.n=6)
+##Indexplot of the influence 
+influencePlot(model.comp_test,id.n=6)
+vif(model.comp_test)
+###plot(Corolla$Doors,Corolla$Price,col="dodgerblue4", pch=20)
+layout(matrix(c(1,2,3,4),2,2))
+avPlots(model.comp_test)
+##Lets remove 346th,435th,961th,1253th observation from test model
+model.comp_test_1 <- lm(comp_test$price ~ comp_test$speed + comp_test$hd +comp_test$ram + 
+                        comp_test$screen + sqrt(comp_test$ads) + exp(comp_test$trend),data = comp_test[-c(5346,5435,5961,6253),])
+summary(model.comp_test_1)
+###Lets combine both the training and test models
+model.final<-lm(comp$price ~ comp$speed + comp$hd +comp$ram + 
+                  comp$screen + sqrt(comp$ads) + exp(comp$trend),data = comp[-c(1441,1701,3784,4478,5346,5435,5961,6253),])
+summary(model.final)
+##As per final model Multiple R-squared :- 0.7173, Adjusted R-squared got increased to 0.717
+plot(model.final)
+qqPlot(model.final) 
+

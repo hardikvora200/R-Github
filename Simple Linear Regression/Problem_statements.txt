@@ -1,0 +1,671 @@
+1) Calories_consumed-> predict weight gained using calories consumed
+
+R Code:-
+
+weight<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\calories_consumed.csv")
+View(weight)
+attach(weight)
+summary(weight)
+plot(Weight.gained..grams.,Calories.Consumed)
+reg<-lm(Weight.gained..grams.~Calories.Consumed)
+summary(reg)
+confint(reg,level=0.95)
+predict(reg, interval="predict")
+reg_log<-lm(Weight.gained..grams.~log(Calories.Consumed))
+summary(reg_log)
+confint(reg_log,level=0.95)
+predict(reg_log,interval="predict")
+reg_exp<-lm(log(Weight.gained..grams.)~Calories.Consumed)
+summary(reg_exp)
+confint(reg_exp, level=0.95)
+predict(reg_exp, interval="predict")
+
+
+Observations after executing R Code:-
+
+
+
+> weight<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\calories_consumed.csv")
+> View(weight)
+> attach(weight)
+The following objects are masked from weight (pos = 3):
+
+    Calories.Consumed, Weight.gained..grams.
+
+> summary(weight)
+ Weight.gained..grams. Calories.Consumed
+ Min.   :  62.0        Min.   :1400     
+ 1st Qu.: 114.5        1st Qu.:1728     
+ Median : 200.0        Median :2250     
+ Mean   : 357.7        Mean   :2341     
+ 3rd Qu.: 537.5        3rd Qu.:2775     
+ Max.   :1100.0        Max.   :3900     
+> plot(Weight.gained..grams.,Calories.Consumed)
+> reg<-lm(Weight.gained..grams.~Calories.Consumed)
+> summary(reg)
+
+Call:
+lm(formula = Weight.gained..grams. ~ Calories.Consumed)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-158.67 -107.56   36.70   81.68  165.53 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       -625.75236  100.82293  -6.206 4.54e-05 ***
+Calories.Consumed    0.42016    0.04115  10.211 2.86e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 111.6 on 12 degrees of freedom
+Multiple R-squared:  0.8968,	Adjusted R-squared:  0.8882 
+F-statistic: 104.3 on 1 and 12 DF,  p-value: 2.856e-07
+
+> confint(reg,level=0.95)
+                         2.5 %       97.5 %
+(Intercept)       -845.4266546 -406.0780569
+Calories.Consumed    0.3305064    0.5098069
+> predict(reg, interval="predict")
+           fit        lwr       upr
+1     4.482599 -258.20569  267.1709
+2   340.607908   88.93791  592.2779
+3   802.780209  533.81393 1071.7465
+4   298.592245   46.63271  550.5518
+5   424.639236  172.59086  676.6876
+6    46.498263 -213.75953  306.7561
+7   -37.533065 -302.93258  227.8664
+8   172.545254  -82.18110  427.2716
+9   550.686227  295.69632  805.6761
+10 1012.858527  724.99432 1300.7227
+11   75.909227 -182.81852  334.6370
+12  172.545254  -82.18110  427.2716
+13  508.670563  254.97398  762.3671
+14  634.717554  376.22600  893.2091
+Warning message:
+In predict.lm(reg, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+> reg_log<-lm(Weight.gained..grams.~log(Calories.Consumed))
+> summary(reg_log)
+
+Call:
+lm(formula = Weight.gained..grams. ~ log(Calories.Consumed))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-187.44 -142.96   23.13  113.20  213.82 
+
+Coefficients:
+                       Estimate Std. Error t value Pr(>|t|)    
+(Intercept)             -6955.7     1030.9  -6.747 2.05e-05 ***
+log(Calories.Consumed)    948.4      133.6   7.100 1.25e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 152.3 on 12 degrees of freedom
+Multiple R-squared:  0.8077,	Adjusted R-squared:  0.7917 
+F-statistic:  50.4 on 1 and 12 DF,  p-value: 1.248e-05
+
+> confint(reg_log,level=0.95)
+                            2.5 %    97.5 %
+(Intercept)            -9201.8063 -4709.494
+log(Calories.Consumed)   657.3251  1239.418
+> predict(reg_log,interval="predict")
+         fit          lwr       upr
+1  -19.99870 -382.5178898  342.5205
+2  385.37711   41.7849717  728.9693
+3  756.06367  391.4700627 1120.6573
+4  343.22032   -0.2957275  686.7364
+5  464.45388  119.4081720  809.4996
+6   41.20781 -315.7491910  398.1648
+7  -85.42959 -454.8597180  284.0005
+8  204.18573 -142.5179686  550.8894
+9  571.93160  222.2096884  921.6535
+10 886.18133  506.3308457 1266.0318
+11  81.81708 -271.9519877  435.5861
+12 204.18573 -142.5179686  550.8894
+13 537.44155  189.5540023  885.3291
+14 637.36248  283.3161385  991.4088
+Warning message:
+In predict.lm(reg_log, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+> reg_exp<-lm(log(Weight.gained..grams.)~Calories.Consumed)
+> summary(reg_exp)
+
+Call:
+lm(formula = log(Weight.gained..grams.) ~ Calories.Consumed)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.86537 -0.10532  0.02462  0.13467  0.42632 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       2.8386724  0.2994581   9.479 6.36e-07 ***
+Calories.Consumed 0.0011336  0.0001222   9.276 8.02e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3314 on 12 degrees of freedom
+Multiple R-squared:  0.8776,	Adjusted R-squared:  0.8674 
+F-statistic: 86.04 on 1 and 12 DF,  p-value: 8.018e-07
+
+> summary(reg_exp)
+
+Call:
+lm(formula = log(Weight.gained..grams.) ~ Calories.Consumed)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.86537 -0.10532  0.02462  0.13467  0.42632 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       2.8386724  0.2994581   9.479 6.36e-07 ***
+Calories.Consumed 0.0011336  0.0001222   9.276 8.02e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3314 on 12 degrees of freedom
+Multiple R-squared:  0.8776,	Adjusted R-squared:  0.8674 
+F-statistic: 86.04 on 1 and 12 DF,  p-value: 8.018e-07
+
+> confint(reg_exp, level=0.95)
+                         2.5 %      97.5 %
+(Intercept)       2.1862091856 3.491135698
+Calories.Consumed 0.0008673238 0.001399871
+> predict(reg_exp, interval="predict")
+        fit      lwr      upr
+1  4.539069 3.758848 5.319289
+2  5.445947 4.698452 6.193442
+3  6.692904 5.894036 7.491771
+4  5.332587 4.584232 6.080942
+5  5.672666 4.924047 6.421285
+6  4.652428 3.879426 5.425430
+7  4.425709 3.637435 5.213982
+8  4.992508 4.235935 5.749080
+9  6.012745 5.255390 6.770101
+10 7.259702 6.404706 8.114699
+11 4.731780 3.963323 5.500238
+12 4.992508 4.235935 5.749080
+13 5.899386 5.145871 6.652900
+14 6.239465 5.471709 7.007221
+Warning message:
+In predict.lm(reg_exp, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+----As R-square value of normal plot is 0.8968 so the equation is Weight.gained..grams. = -625.75236 +0.42(calories.consumed)
+----upr = Weight.gained..grams. = -406.0780569 + 0.5098069(calories.consumed),
+----lwr = Weight.gained..grams. = -845.4266546 + 0.3305064(calories.consumed)
+---- Now substitute the first data from excel sheet i.e. calories.consumed = 1500 in equation  Weight.gained..grams. = -625.75236 +0.42(calories.consumed)
+---- We will get fit value of weight.gained..grams = 4.48, but actual value is 108, so the error is 108- 4.48 = 103.52 grams = e1
+----Similarly check for other errors
+
+
+
+
+
+
+2) Delivery_time -> Predict delivery time using sorting time
+
+R Code:-
+
+
+Delivery_Time<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\delivery_time.csv")
+View(Delivery_Time)
+attach(Delivery_Time)
+summary(Delivery_Time)
+plot(Delivery.Time,Sorting.Time)
+reg<-lm(Delivery.Time~Sorting.Time)
+summary(reg)
+confint(reg,level=0.95)
+predict(reg, interval="predict")
+reg_log<-lm(Delivery.Time~log(Sorting.Time))
+summary(reg_log)
+confint(reg_log,level=0.95)
+predict(reg_log,interval="predict")
+reg_exp<-lm(log(Delivery.Time)~Sorting.Time)
+summary(reg_exp)
+confint(reg_exp, level=0.95)
+predict(reg_exp, interval="predict")
+
+Observations from R Code:-
+
+> Delivery_Time<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\delivery_time.csv")
+> View(Delivery_Time)
+> attach(Delivery_Time)
+> summary(Delivery_Time)
+ Delivery.Time    Sorting.Time  
+ Min.   : 8.00   Min.   : 2.00  
+ 1st Qu.:13.50   1st Qu.: 4.00  
+ Median :17.83   Median : 6.00  
+ Mean   :16.79   Mean   : 6.19  
+ 3rd Qu.:19.75   3rd Qu.: 8.00  
+ Max.   :29.00   Max.   :10.00  
+> plot(Delivery.Time,Sorting.Time)
+> reg<-lm(Delivery.Time~Sorting.Time)
+> summary(reg)
+
+Call:
+lm(formula = Delivery.Time ~ Sorting.Time)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.1729 -2.0298 -0.0298  0.8741  6.6722 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    6.5827     1.7217   3.823  0.00115 ** 
+Sorting.Time   1.6490     0.2582   6.387 3.98e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.935 on 19 degrees of freedom
+Multiple R-squared:  0.6823,	Adjusted R-squared:  0.6655 
+F-statistic:  40.8 on 1 and 19 DF,  p-value: 3.983e-06
+
+> confint(reg,level=0.95)
+                2.5 %    97.5 %
+(Intercept)  2.979134 10.186334
+Sorting.Time 1.108673  2.189367
+> predict(reg, interval="predict")
+         fit       lwr      upr
+1  23.072933 16.457161 29.68870
+2  13.178814  6.780993 19.57663
+3  16.476853 10.188630 22.76508
+4  21.423913 14.955850 27.89198
+5  23.072933 16.457161 29.68870
+6  16.476853 10.188630 22.76508
+7  18.125873 11.823294 24.42845
+8  11.529794  5.010345 18.04924
+9  23.072933 16.457161 29.68870
+10 21.423913 14.955850 27.89198
+11 19.774893 13.411938 26.13785
+12 13.178814  6.780993 19.57663
+13 18.125873 11.823294 24.42845
+14 11.529794  5.010345 18.04924
+15 11.529794  5.010345 18.04924
+16 13.178814  6.780993 19.57663
+17 16.476853 10.188630 22.76508
+18 18.125873 11.823294 24.42845
+19  9.880774  3.198090 16.56346
+20 18.125873 11.823294 24.42845
+21 14.827833  8.507631 21.14804
+Warning message:
+In predict.lm(reg, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+> reg_log<-lm(Delivery.Time~log(Sorting.Time))
+> summary(reg_log)
+
+Call:
+lm(formula = Delivery.Time ~ log(Sorting.Time))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.0829 -2.0133 -0.1965  0.9351  7.0171 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)          1.160      2.455   0.472    0.642    
+log(Sorting.Time)    9.043      1.373   6.587 2.64e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.873 on 19 degrees of freedom
+Multiple R-squared:  0.6954,	Adjusted R-squared:  0.6794 
+F-statistic: 43.39 on 1 and 19 DF,  p-value: 2.642e-06
+
+> confint(reg_log,level=0.95)
+                     2.5 %    97.5 %
+(Intercept)       -3.97778  6.297147
+log(Sorting.Time)  6.16977 11.917057
+> predict(reg_log,interval="predict")
+        fit        lwr      upr
+1  21.98291 15.6099875 28.35584
+2  13.69652  7.4628028 19.93023
+3  17.36331 11.2049447 23.52167
+4  21.03009 14.7287585 27.33143
+5  21.98291 15.6099875 28.35584
+6  17.36331 11.2049447 23.52167
+7  18.75735 12.5700473 24.94466
+8  11.09489  4.6786298 17.51115
+9  21.98291 15.6099875 28.35584
+10 21.03009 14.7287585 27.33143
+11 19.96493 13.7271824 26.20268
+12 13.69652  7.4628028 19.93023
+13 18.75735 12.5700473 24.94466
+14 11.09489  4.6786298 17.51115
+15 11.09489  4.6786298 17.51115
+16 13.69652  7.4628028 19.93023
+17 17.36331 11.2049447 23.52167
+18 18.75735 12.5700473 24.94466
+19  7.42810  0.5911537 14.26505
+20 18.75735 12.5700473 24.94466
+21 15.71450  9.5493253 21.87967
+Warning message:
+In predict.lm(reg_log, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+> reg_exp<-lm(log(Delivery.Time)~Sorting.Time)
+> summary(reg_exp)
+
+Call:
+lm(formula = log(Delivery.Time) ~ Sorting.Time)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.29209 -0.13364  0.02065  0.08421  0.41892 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   2.12137    0.10297  20.601 1.86e-14 ***
+Sorting.Time  0.10555    0.01544   6.836 1.59e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1755 on 19 degrees of freedom
+Multiple R-squared:  0.7109,	Adjusted R-squared:  0.6957 
+F-statistic: 46.73 on 1 and 19 DF,  p-value: 1.593e-06
+
+> confint(reg_exp, level=0.95)
+                  2.5 %    97.5 %
+(Intercept)  1.90584807 2.3368956
+Sorting.Time 0.07323457 0.1378686
+> predict(reg_exp, interval="predict")
+        fit      lwr      upr
+1  3.176888 2.781212 3.572563
+2  2.543578 2.160938 2.926219
+3  2.754681 2.378596 3.130767
+4  3.071336 2.684495 3.458178
+5  3.176888 2.781212 3.572563
+6  2.754681 2.378596 3.130767
+7  2.860233 2.483289 3.237177
+8  2.438027 2.048112 2.827941
+9  3.176888 2.781212 3.572563
+10 3.071336 2.684495 3.458178
+11 2.965785 2.585230 3.346340
+12 2.543578 2.160938 2.926219
+13 2.860233 2.483289 3.237177
+14 2.438027 2.048112 2.827941
+15 2.438027 2.048112 2.827941
+16 2.543578 2.160938 2.926219
+17 2.754681 2.378596 3.130767
+18 2.860233 2.483289 3.237177
+19 2.332475 1.932798 2.732152
+20 2.860233 2.483289 3.237177
+21 2.649130 2.271132 3.027128
+Warning message:
+In predict.lm(reg_exp, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+
+----As R-square value of exponential plot is 0.7109 so the equation is log(Delivery.Time) = 2.12137 +0.10555(Sorting.Time)
+----upr = log(Delivery.Time) = 2.3368956 + 0.1378686(Sorting.Time) 
+----lwr = log(Delivery.Time) = 1.90584807 + 0.07323457 (Sorting.Time) 
+
+---- Now substitute the first data from excel sheet i.e. Sorting.Time = 10 in equation  log(Delivery.Time) = 2.12137 +0.10555(Sorting.Time)
+---Here we will get log(Delivery_Time) = 3.176888, so Delivery time is 23.97204
+---- We will predicted value of Delivery Time = 23.97204, but actual value is 21.00, so the error is 21.00 - 23.97204 = - 2.97204 = e1
+----Similarly check for other errors
+
+
+
+
+ 
+3) Emp_data -> Build a prediction model for Churn_out_rate 
+
+R Code:-
+
+
+Churn_Out_Rate<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\emp_data.csv")
+View(Churn_Out_Rate)
+attach(Churn_Out_Rate)
+summary(Churn_Out_Rate)
+plot(Churn_out_rate,Salary_hike)
+reg<-lm(Churn_out_rate~Salary_hike)
+summary(reg)
+confint(reg,level=0.95)
+predict(reg, interval="predict")
+reg_log<-lm(Churn_out_rate~log(Salary_hike))
+summary(reg_log)
+confint(reg_log,level=0.95)
+predict(reg_log,interval="predict")
+reg_exp<-lm(log(Churn_out_rate)~Salary_hike)
+summary(reg_exp)
+confint(reg_exp, level=0.95)
+predict(reg_exp, interval="predict")
+
+
+Observations from R Code:-
+
+> Churn_Out_Rate<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\emp_data.csv")
+> View(Churn_Out_Rate)
+> attach(Churn_Out_Rate)
+> summary(Churn_Out_Rate)
+  Salary_hike   Churn_out_rate 
+ Min.   :1580   Min.   :60.00  
+ 1st Qu.:1618   1st Qu.:65.75  
+ Median :1675   Median :71.00  
+ Mean   :1689   Mean   :72.90  
+ 3rd Qu.:1724   3rd Qu.:78.75  
+ Max.   :1870   Max.   :92.00  
+> plot(Churn_out_rate,Salary_hike)
+> reg<-lm(Churn_out_rate~Salary_hike)
+> summary(reg)
+
+Call:
+lm(formula = Churn_out_rate ~ Salary_hike)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-3.804 -3.059 -1.819  2.430  8.072 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 244.36491   27.35194   8.934 1.96e-05 ***
+Salary_hike  -0.10154    0.01618  -6.277 0.000239 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.469 on 8 degrees of freedom
+Multiple R-squared:  0.8312,	Adjusted R-squared:  0.8101 
+F-statistic:  39.4 on 1 and 8 DF,  p-value: 0.0002386
+
+> confint(reg,level=0.95)
+                  2.5 %      97.5 %
+(Intercept) 181.2912317 307.4385905
+Salary_hike  -0.1388454  -0.0642399
+> predict(reg, interval="predict")
+        fit      lwr      upr
+1  83.92753 72.38391 95.47115
+2  81.89668 70.59327 93.20009
+3  80.88125 69.68123 92.08127
+4  77.83497 66.87456 88.79538
+5  75.80412 64.94216 86.66607
+6  72.75784 61.94828 83.56740
+7  71.13316 60.30425 81.96206
+8  68.69613 57.77694 79.61533
+9  61.58815 50.00746 73.16884
+10 54.48016 41.72742 67.23290
+Warning message:
+In predict.lm(reg, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+> reg_log<-lm(Churn_out_rate~log(Salary_hike))
+> summary(reg_log)
+
+Call:
+lm(formula = Churn_out_rate ~ log(Salary_hike))
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-3.678 -2.851 -1.794  2.275  7.624 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        1381.5      195.4   7.070 0.000105 ***
+log(Salary_hike)   -176.1       26.3  -6.697 0.000153 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.233 on 8 degrees of freedom
+Multiple R-squared:  0.8486,	Adjusted R-squared:  0.8297 
+F-statistic: 44.85 on 1 and 8 DF,  p-value: 0.0001532
+
+> confint(reg_log,level=0.95)
+                     2.5 %    97.5 %
+(Intercept)       930.8584 1832.0540
+log(Salary_hike) -236.7512 -115.4682
+> predict(reg_log,interval="predict")
+        fit      lwr      upr
+1  84.37627 73.40258 95.34996
+2  82.16102 71.43838 92.88366
+3  81.06376 70.44736 91.68017
+4  77.81241 67.43614 88.18869
+5  75.67773 65.39568 85.95978
+6  72.52344 62.28515 82.76172
+7  70.86397 60.60253 81.12541
+8  68.40372 58.04985 78.75760
+9  61.41829 50.44392 72.39265
+10 54.69939 42.69592 66.70286
+Warning message:
+In predict.lm(reg_log, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+> reg_exp<-lm(log(Churn_out_rate)~Salary_hike)
+> summary(reg_exp)
+
+Call:
+lm(formula = log(Churn_out_rate) ~ Salary_hike)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.04825 -0.03519 -0.01909  0.02942  0.08970 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  6.6383000  0.3175983  20.902 2.88e-08 ***
+Salary_hike -0.0013963  0.0001878  -7.434 7.38e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.0519 on 8 degrees of freedom
+Multiple R-squared:  0.8735,	Adjusted R-squared:  0.8577 
+F-statistic: 55.26 on 1 and 8 DF,  p-value: 7.377e-05
+
+> confint(reg_exp, level=0.95)
+                   2.5 %        97.5 %
+(Intercept)  5.905917079  7.3706828388
+Salary_hike -0.001829477 -0.0009631923
+> predict(reg_exp, interval="predict")
+        fit      lwr      upr
+1  4.432091 4.298052 4.566130
+2  4.404164 4.272914 4.535414
+3  4.390201 4.260151 4.520250
+4  4.348311 4.221044 4.475578
+5  4.320384 4.194260 4.446508
+6  4.278494 4.152978 4.404010
+7  4.256153 4.130412 4.381893
+8  4.222641 4.095852 4.349429
+9  4.124897 3.990428 4.259367
+10 4.027154 3.879075 4.175233
+Warning message:
+In predict.lm(reg_exp, interval = "predict") :
+  predictions on current data refer to _future_ responses
+
+
+
+----As R-square value of exponential plot is 0.8735 so the equation is log(Churn_out_rate) = 6.6383000 - 0.0013963(Salary_hike)
+----upr = log(Churn_out_rate) = 7.3706828388 - 0.0009631923(Salary_hike)
+----lwr = log(Churn_out_rate) = 5.905917079  - 0.001829477(Salary_hike)
+
+---- Now substitute the first data from excel sheet i.e. Salary_hike = 1580 in equation  log(Churn_out_rate) = 6.6383000 - 0.0013963(Salary_hike)
+---Here we will get log(churn_out_rate) = 4.432091, so churn_out_rate = 84.11173
+---- We will fit value of get churn_out_rate = 84.11173 , but actual value is 92.00, so the error is 92- 84.11 = 7.88 = e1
+----Similarly check for other errors
+
+
+
+4) Salary_hike -> Build a prediction model for Salary_hike
+
+
+Do the necessary transformations for input variables for getting better R^2 value for the model prepared.
+
+
+R Code:-
+
+
+Salary<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\Salary_Data.csv")
+View(Salary)
+attach(Salary)
+summary(Salary)
+plot(Salary,YearsExperience)
+reg<-lm(Salary~YearsExperience)
+summary(reg)
+confint(reg,level=0.95)
+predict(reg, interval="predict")
+reg_log<-lm(Salary~log(YearsExperience))
+summary(reg_log)
+confint(reg_log,level=0.95)
+predict(reg_log,interval="predict")
+reg_exp<-lm(log(Salary)~YearsExperience)
+summary(reg_exp)
+confint(reg_exp, level=0.95)
+predict(reg_exp, interval="predict")
+
+Observations from R Code
+> Salary<-read.csv("C:\\Users\\sanu\\Downloads\\Desktop\\Documents\\Excelr\\Simple Linear Regression\\Salary_Data.csv")
+> View(Salary)
+> attach(Salary)
+The following object is masked _by_ .GlobalEnv:
+
+    Salary
+
+The following objects are masked from Salary (pos = 3):
+
+    Salary, YearsExperience
+
+The following objects are masked from Salary (pos = 4):
+
+    Salary, YearsExperience
+
+> summary(Salary)
+ YearsExperience      Salary      
+ Min.   : 1.100   Min.   : 37731  
+ 1st Qu.: 3.200   1st Qu.: 56721  
+ Median : 4.700   Median : 65237  
+ Mean   : 5.313   Mean   : 76003  
+ 3rd Qu.: 7.700   3rd Qu.:100545  
+ Max.   :10.500   Max.   :122391  
+> plot(Salary,YearsExperience)
+> reg<-lm(Salary~YearsExperience)
+Error in model.frame.default(formula = Salary ~ YearsExperience, drop.unused.levels = TRUE) : 
+  invalid type (list) for variable 'Salary'
+> summary(reg)
+
+Call:
+lm(formula = Churn_out_rate ~ Salary_hike)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-3.804 -3.059 -1.819  2.430  8.072 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 244.36491   27.35194   8.934 1.96e-05 ***
+Salary_hike  -0.10154    0.01618  -6.277 0.000239 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.469 on 8 degrees of freedom
+Multiple R-squared:  0.8312,	Adjusted R-squared:  0.8101 
+F-statistic:  39.4 on 1 and 8 DF,  p-value: 0.0002386
+ 
+--- This one has some issue with dataset like 3rd and 4th row is masked.
+
+----So please provide the required dataset/ solutions for this
+
+
