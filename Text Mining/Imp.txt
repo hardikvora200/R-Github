@@ -1,0 +1,9 @@
+Website URL:- https://hardik.twitter.com
+
+Callback URl:- https://hardik.twitter.com
+
+Application Description - Perform sentiment analysis and emotion mining on tweets
+
+Tell us how this app will be used - This app will take tweets of twitter user and perform sentiment analysis and emotion mining which will helpful in business decisions.
+
+App Name - hardikvora200
